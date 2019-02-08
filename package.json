@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "auth0-lock": "^10.13.0",
+    "bootstrap": "^3.3.7",
     "react": "^16.8.0",
+    "react-bootstrap": "^0.30.8",
     "react-dom": "^16.8.0",
     "react-scripts": "2.1.3"
   },
