@@ -1,22 +1,95 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Github from'./Github';
-import Menu from'./Components/Nav';
+import Header from'./Components/Nav';
+import Auth0Lock from 'auth0-lock';
 
 class App extends Component {
+  constructor(props){
+    super(props);
+
+    this.state = {
+      idToken: '',
+      profile:{}
+    };
+  }
+  static defaultProps = {
+    clientID:'rqEYvgQwMGrr6JZTlqi7E72BbOnXLYkL',
+    domain:'monikarangta.eu.auth0.com'
+  }
+  componentWillMount(){
+    this.lock = new Auth0Lock(this.props.clientID, this.props.domain);
+    this.lock.on('authenticated', (authResult) => {
+      // console.log(authResult);
+      this.lock.getUserInfo(authResult.accessToken, (error, profile)=>{
+        if(error){
+          console.log(error);
+          return;
+        }
+        //  console.log(profile);
+        this.setProfile(authResult.accessToken, profile);
+      });
+    });
+    this.getProfile();
+  }
+
+  setProfile(idToken,profile){
+    localStorage.setItem('idToken', idToken);
+    localStorage.setItem('profile',JSON.stringify(profile));
+    this.setState({
+      idToken: localStorage.getItem('idToken'),
+      profile: JSON.parse(localStorage.getItem('profile'))
+    });
+  }
+
+  getProfile(){
+    if(localStorage.getItem('idToken') != null){
+      this.setState({
+        idtoken: localStorage.getItem('idToken'),
+        profile: JSON.parse(localStorage.getItem('profile'))
+      },() => {
+        console.log(this.state);
+      });
+    }
+  }
+
+  showLock(){
+    this.lock.show();
+  }
+
+  logout(){
+    this.setState({
+      idToken: '',
+      profile:''
+    }, ()=>{
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('profile');
+    });
+
+    }
   render() {
+    let gitty;
+
+    if (this.state.idToken){
+      gitty = <Github/>
+    } else {
+      gitty = <h2>"Click on Login to view Github Viewer"</h2>
+    }
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-        </header>
-        <Menu/>
-        <Github/>
+        <Header
+          lock = {this.lock}
+           idToken={this.state.idToken}
+           onLogout={this.logout.bind(this)}
+           onLogin = {this.showLock.bind(this)}
+           />
+        {gitty}
       </div>
     );
   }
 }
+
 
 export default App;

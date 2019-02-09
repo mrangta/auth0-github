@@ -1,21 +1,32 @@
 import React, {Component} from 'react';
 import {Navbar, Nav, NavItem} from 'react-bootstrap';
 
-class Menu extends Component {
+class Header extends Component {
+
+  onLogin(){
+   this.props.onLogin();
+  }
+  onLogout(){
+   this.props.onLogout();
+  }
   render(){
+    let page;
+    if(this.props.idToken){
+      page = <NavItem onClick = {this.onLogout.bind(this)}><a href="#"> Logout</a></NavItem>
+    }else{
+      page = <NavItem onClick = {this.onLogin.bind(this)}><a href="#"> Login</a></NavItem>
+    }
     return(
-      <div>
       <Navbar>
         <Navbar.Brand>
-          Github Searcher
+          Github Searcher |
         </Navbar.Brand>
         <Nav>
-          <NavItem href="#">Login</NavItem>
+          {page}
         </Nav>
       </Navbar>
-      </div>
     );
   }
 }
 
-export default Menu;
+export default Header;
